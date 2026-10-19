@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Phantom Scripts</title>
+<style>
+:root{--c:#8b5cf6;--bg:#0a0a10;--tx:#ecebf5;--mu:#8a89a0;--sh:.6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;overflow:hidden}
+canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.scr{position:fixed;inset:0;z-index:1;display:none;flex-direction:column;align-items:center;padding:calc(env(safe-area-inset-top) + 24px) 20px 24px;overflow-y:auto}
+.scr.on{display:flex}
+h1{font-size:26px;margin:8px 0 4px;letter-spacing:.5px}
+p.s{color:var(--mu);margin:0 0 20px;font-size:14px;text-align:center}
+input,button{font:inherit}
+input{width:100%;max-width:320px;padding:14px 16px;margin:6px 0;border-radius:14px;border:1px solid #2a2940;background:#14131f;color:var(--tx);outline:none}
+input:focus{border-color:var(--c)}
+.btn{padding:14px 22px;border:0;border-radius:14px;background:var(--c);color:#fff;font-weight:600;margin:6px 0;cursor:pointer;box-shadow:0 6px calc(24px*var(--sh)*2) color-mix(in srgb,var(--c) calc(var(--sh)*100%),transparent)}
+.btn.g{background:#1c1b2c;box-shadow:none;color:var(--tx)}
+.btn.r{background:#c0364f}
+.err{color:#ff6b81;min-height:20px;font-size:14px}
+.menu{display:flex;flex-direction:column;align-items:center;gap:22px;margin-top:6px;padding-bottom:30px}
+.circ{width:112px;height:112px;border-radius:50%;border:2px solid var(--c);background:radial-gradient(circle at 35% 30%,#23213a,#12111c);color:var(--tx);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:13px;cursor:pointer;box-shadow:0 8px calc(34px*var(--sh)*2) color-mix(in srgb,var(--c) calc(var(--sh)*100%),transparent)}
+.circ:active{transform:scale(.95)}
+.circ i{font-style:normal;font-size:30px}
+.circ.half{height:56px;border-radius:112px 112px 0 0;border-bottom:0;flex-direction:row;background:#1a1530;margin-top:-6px}
+.circ.half i{font-size:18px}
+.top{width:100%;max-width:360px;display:flex;justify-content:space-between;margin-bottom:8px}
+.card{width:100%;max-width:360px;background:#14131fcc;border:1px solid #2a2940;border-radius:18px;padding:16px;margin:8px 0}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0}
+.sw{display:flex;gap:10px;flex-wrap:wrap}
+.sw b{width:34px;height:34px;border-radius:50%;cursor:pointer;border:2px solid transparent}
+.sw b.on{border-color:#fff}
+input[type=range]{padding:0;margin:0;max-width:160px;accent-color:var(--c)}
+input[type=color]{width:44px;height:34px;padding:0;border:0;background:none;margin:0}
+.acc{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #24233a;font-size:14px}
+.acc small{color:var(--mu);display:block}
+.mini{padding:7px 10px;font-size:12px;margin:0 0 0 4px;border-radius:10px}
+.acts{display:flex;flex-wrap:wrap;justify-content:flex-end}
+</style></head><body>
+<canvas id="smoke"></canvas>
+
+<div class="scr on" id="login">
+ <div style="margin-top:12vh;text-align:center"><h1>Phantom Scripts</h1><p class="s">Введите логин и пароль, которые вам выдали</p></div>
+ <input id="lg" placeholder="Логин" autocapitalize="off" autocomplete="off">
+ <input id="pw" type="password" placeholder="Пароль">
+ <div class="err" id="er"></div>
+ <button class="btn" onclick="doLogin()" style="width:100%;max-width:320px">Войти</button>
+</div>
+
+<div class="scr" id="home">
+ <h1>Phantom Scripts</h1><p class="s" id="who"></p>
+ <div class="menu">
+  <div class="circ" onclick="go('scripts')"><i>📜</i>Скрипты</div>
+  <div class="circ" onclick="go('custom')"><i>🎨</i>Кастомизация</div>
+  <div class="circ" onclick="go('settings')"><i>⚙️</i>Настройки</div>
+  <div class="circ" onclick="go('picker')"><i>💧</i>Пипетка</div>
+  <div class="circ half" id="cabBtn" style="display:none;width:112px" onclick="go('cab')"><i>🗂</i>Кабинет</div>
+ </div>
+ <button class="btn g" onclick="logout()">Выйти</button>
+</div>
+
+<div class="scr" id="scripts"><div class="top"><button class="btn g" onclick="go('home')">Назад</button></div>
+ <h1>Скрипты</h1><div class="card"><p class="s" style="margin:0">Здесь появятся ваши скрипты. Они будут добавлены в следующих обновлениях.</p></div></div>
+
+<div class="scr" id="custom"><div class="top"><button class="btn g" onclick="go('home')">Назад</button></div>
+ <h1>Кастомизация</h1>
+ <div class="card"><div style="margin-bottom:10px">Цвет интерфейса</div>
+  <div class="sw" id="sw"></div>
+  <div class="row"><span>Свой цвет</span><input type="color" id="cc"></div></div>
+ <div class="card"><div class="row"><span>Тень кнопок</span><input type="range" id="shr" min="0" max="100"></div></div>
+ <div class="card"><div class="row"><span>Дым на фоне</span><input type="checkbox" id="smk" style="width:22px;height:22px;accent-color:var(--c)"></div>
+  <div class="row"><span>Плотность дыма</span><input type="range" id="smd" min="1" max="100"></div></div>
+</div>
+
+<div class="scr" id="settings"><div class="top"><button class="btn g" onclick="go('home')">Назад</button></div>
+ <h1>Настройки</h1><div class="card"><p class="s" style="margin:0">Раздел появится вместе со скриптами.</p></div></div>
+
+<div class="scr" id="picker"><div class="top"><button class="btn g" onclick="go('home')">Назад</button></div>
+ <h1>Пипетка</h1><div class="card"><p class="s" style="margin:0">Раздел появится вместе со скриптами.</p></div></div>
+
+<div class="scr" id="cab"><div class="top"><button class="btn g" onclick="go('home')">Назад</button></div>
+ <h1>Кабинет</h1>
+ <div class="card"><div style="margin-bottom:6px">Создать аккаунт</div>
+  <input id="nl" placeholder="Логин" autocapitalize="off"><input id="np" placeholder="Пароль">
+  <input id="nd" type="number" min="1" placeholder="Срок в днях (пусто — без ограничения)">
+  <div class="err" id="ce"></div>
+  <button class="btn" onclick="createAcc()" style="width:100%">Создать аккаунт</button></div>
+ <div class="card"><div>Аккаунты</div><div id="list"></div></div>
+</div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+function ld(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+var S=ld('ps_set',{c:'#8b5cf6',sh:60,smoke:true,sd:50}), cur=null;
+function go(id){document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});$(id).classList.add('on');if(id=='cab')renderList()}
+/* server */
+var SB_URL='https://tufllzgkwzobdckusiqf.supabase.co';
+var SB_KEY='sb_publishable_j4Jug-0XWGHCL36eY3kuOQ_lXEWsoU9';
+function rpc(fn,args){
+ if(SB_URL.indexOf('http')!==0)return Promise.resolve({ok:false,err:'Не указан адрес сервера в приложении'});
+ return fetch(SB_URL.replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args)})
+ .then(function(r){return r.json().then(function(j){return r.ok?j:{ok:false,err:'Нет доступа'}})})
+ .catch(function(){return{ok:false,err:'Нет соединения с сервером'}})}
+function fmt(d){return new Date(d).toLocaleDateString('ru-RU')}
+/* auth */
+function doLogin(){
+ var l=$('lg').value.trim(),p=$('pw').value;
+ if(!l||!p){$('er').textContent='Введите логин и пароль';return}
+ $('er').textContent='Проверка...';
+ rpc('app_login',{l:l,p:p}).then(function(r){
+  if(!r.ok){$('er').textContent=r.err||'Ошибка входа';return}
+  enter(l,p,r)})}
+function enter(l,p,r){cur={l:l,p:p,adm:!!r.admin};sv('ps_sess',{l:l,p:p});$('er').textContent='';$('pw').value='';
+ $('cabBtn').style.display=r.admin?'flex':'none';
+ $('who').textContent=r.admin?'Аккаунт создателя':(r.exp?'Доступ до '+fmt(r.exp):'Доступ без ограничения');go('home')}
+function logout(){cur=null;sv('ps_sess',null);go('login')}
+/* cabinet */
+function A(fn,x){var o={al:cur.l,ap:cur.p};for(var k in x)o[k]=x[k];return rpc(fn,o)}
+function createAcc(){
+ var l=$('nl').value.trim(),p=$('np').value.trim(),d=parseInt($('nd').value)||0;
+ if(!l||!p){$('ce').textContent='Введите логин и пароль';return}
+ A('admin_create',{l:l,p:p,days:d}).then(function(r){
+  if(!r.ok){$('ce').textContent=r.err||'Ошибка';return}
+  $('ce').textContent='';$('nl').value=$('np').value=$('nd').value='';renderList()})}
+function renderList(){
+ $('list').innerHTML='<p class="s" style="margin:12px 0 0">Загрузка...</p>';
+ A('admin_list',{}).then(function(L){
+  if(!Array.isArray(L)){$('list').innerHTML='<p class="s">'+esc(L.err||'Ошибка')+'</p>';return}
+  window.LST=L;var h='';
+  if(!L.length)h='<p class="s" style="margin:12px 0 0">Аккаунтов пока нет</p>';
+  L.forEach(function(a,i){
+   var t=a.exp?(new Date(a.exp)<new Date()?'срок истёк':'до '+fmt(a.exp)):'без ограничения';
+   h+='<div class="acc"><div>'+esc(a.login)+'<small>'+t+(a.frozen?' · заморожен':'')+'</small></div><div class="acts">'+
+   '<button class="btn mini g" onclick="frz('+i+')">'+(a.frozen?'Разморозить':'Заморозить')+'</button>'+
+   '<button class="btn mini g" onclick="tm('+i+')">Время</button>'+
+   '<button class="btn mini r" onclick="del('+i+')">Удалить</button></div></div>'});
+  $('list').innerHTML=h})}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function frz(i){A('admin_freeze',{l:LST[i].login}).then(renderList)}
+function tm(i){var d=prompt('Сколько дней доступа от сегодня? (0 — без ограничения)');if(d===null)return;d=parseInt(d);if(isNaN(d)||d<0)return;
+ A('admin_time',{l:LST[i].login,days:d}).then(renderList)}
+function del(i){if(!confirm('Удалить аккаунт '+LST[i].login+'?'))return;A('admin_delete',{l:LST[i].login}).then(renderList)}
+/* customization */
+var COL=['#8b5cf6','#3b82f6','#10b981','#f43f5e','#f59e0b','#06b6d4','#ec4899'];
+function apply(){var r=document.documentElement.style;r.setProperty('--c',S.c);r.setProperty('--sh',S.sh/100);sv('ps_set',S);
+ $('sw').innerHTML=COL.map(function(c){return '<b style="background:'+c+'" class="'+(c==S.c?'on':'')+'" onclick="S.c=\''+c+'\';$(\'cc\').value=\''+c+'\';apply()"></b>'}).join('')}
+$('cc').value=S.c;$('cc').oninput=function(){S.c=this.value;apply()};
+$('shr').value=S.sh;$('shr').oninput=function(){S.sh=+this.value;apply()};
+$('smk').checked=S.smoke;$('smk').onchange=function(){S.smoke=this.checked;apply()};
+$('smd').value=S.sd;$('smd').oninput=function(){S.sd=+this.value;apply()};
+apply();
+/* smoke */
+var cv=$('smoke'),cx=cv.getContext('2d'),P=[];
+function rs(){cv.width=innerWidth;cv.height=innerHeight}rs();addEventListener('resize',rs);
+function frame(){cx.clearRect(0,0,cv.width,cv.height);
+ if(S.smoke){var n=8+S.sd*.35;
+  while(P.length<n)P.push({x:Math.random()*cv.width,y:cv.height+60,r:60+Math.random()*90,vx:(Math.random()-.5)*.4,vy:-(.3+Math.random()*.6),a:0,life:0});
+  for(var i=P.length-1;i>=0;i--){var p=P[i];p.x+=p.vx;p.y+=p.vy;p.life++;p.r+=.25;
+   p.a=Math.min(p.life/80,1)*Math.max(0,1-p.life/420)*(.05+S.sd/1500);
+   if(p.life>420||p.y<-150){P.splice(i,1);continue}
+   var g=cx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);g.addColorStop(0,hexA(S.c,p.a*3));g.addColorStop(1,hexA(S.c,0));
+   cx.fillStyle=g;cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fill()}}
+ requestAnimationFrame(frame)}
+function hexA(h,a){var n=parseInt(h.slice(1),16);return'rgba('+(n>>16)+','+(n>>8&255)+','+(n&255)+','+a+')'}
+frame();
+/* restore session */
+var ss=ld('ps_sess',null);
+if(ss)rpc('app_login',{l:ss.l,p:ss.p}).then(function(r){if(r.ok)enter(ss.l,ss.p,r)});
+$('pw').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
+</script></body></html>
